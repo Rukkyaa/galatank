@@ -22,51 +22,6 @@ import random
 # 	}]
 # }
 
-
-def	dist(point1, point2):
-	return ((point1[0] - point2[0])**2 + (point1[1] - point2[1])**2) ** 0.5
-
-def det(a, b):
-	return a[0] * b[1] - a[1] * b[0]
-
-# rectanlgles(x, y, w, h)
-
-def	intersection_with_rectangles(line, rectangles):
-	for rectangle in rectangles:
-		a = (rectangle["x"], rectangle["y"])
-		b = (rectangle["x"] + rectangle["width"], rectangle["y"])
-		c = (rectangle["x"] + rectangle["width"], rectangle["y"] + rectangle["height"])
-		d = (rectangle["x"], rectangle["y"] + rectangle["height"])
-		line1 = (a, b)
-		line2 = (b, c)
-		line3 = (c, d)
-		line4 = (d, a)
-		if line_intersection(line, line1) or line_intersection(line, line2) or line_intersection(line, line3) or line_intersection(line, line4):
-			return True
-	return False
-
-def line_intersection(line1, line2):
-	xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0])
-	ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1])
-
-	div = det(xdiff, ydiff)
-	if div == 0:
-		return False
-
-	d = (det(*line1), det(*line2))
-	x = det(d, xdiff) / div
-	y = det(d, ydiff) / div
-
-
-	return is_point_in_segment(line1, (x, y)) and is_point_in_segment(line2, (x, y))
-
-
-def is_point_in_segment(line, point):
-	# half = ((line[0][0] + line[1][0]) / 2, (line[0][1] + line[1][1]) / 2)
-	half = (line[0][0] + (line[1][0] - line[0][0]) / 2, line[0][1] + (line[1][1] - line[0][1]) / 2)
-	dist_with_half = dist(half, point)
-	return (dist_with_half < dist(line[0], line[1]) / 2)
-
 def get_closest_enemy(state):
   player_position = (state["player"]["x"], state["player"]["y"])
 
@@ -78,7 +33,7 @@ def get_closest_enemy(state):
     enemy_position = (enemy["x"], enemy["y"])
     distance = ((player_position[0] - enemy_position[0])**2 + (player_position[1] - enemy_position[1])**2)**0.5
 
-    if distance < min_distance and intersection_with_rectangles((player_position, enemy_position), state["map"]["walls"]) == False:
+    if distance < min_distance:
       min_distance = distance
       closest_enemy = enemy
 
@@ -124,11 +79,10 @@ while True:
   closest_bullet = get_closest_bullet(state)
 
   if state["player"]["canShoot"]:
-    if closest_enemy is not None:
-      newBullet = {
-        "dx": closest_enemy["x"] - state["player"]["x"],
-        "dy": closest_enemy["y"] - state["player"]["y"],
-      }
+    newBullet = {
+      "dx": closest_enemy["x"] - state["player"]["x"] + random.randint(-4, 4),
+      "dy": closest_enemy["y"] - state["player"]["y"] + random.randint(-4, 4),
+    }
 
   direction = get_dodge_direction(closest_bullet)
 
