@@ -92,6 +92,8 @@ while True:
   }))
   sys.stdout.flush()
   
+# http://15.236.134.43:61104/
+
 # {
 # 	"map": {
 # 		"width": 400,
